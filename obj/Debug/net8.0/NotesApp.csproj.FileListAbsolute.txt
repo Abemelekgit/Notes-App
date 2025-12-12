@@ -1,0 +1,14 @@
+/home/abemelek/Documents/Netprojects/NotesApp/bin/Debug/net8.0/NotesApp
+/home/abemelek/Documents/Netprojects/NotesApp/bin/Debug/net8.0/NotesApp.deps.json
+/home/abemelek/Documents/Netprojects/NotesApp/bin/Debug/net8.0/NotesApp.runtimeconfig.json
+/home/abemelek/Documents/Netprojects/NotesApp/bin/Debug/net8.0/NotesApp.dll
+/home/abemelek/Documents/Netprojects/NotesApp/bin/Debug/net8.0/NotesApp.pdb
+/home/abemelek/Documents/Netprojects/NotesApp/obj/Debug/net8.0/NotesApp.GeneratedMSBuildEditorConfig.editorconfig
+/home/abemelek/Documents/Netprojects/NotesApp/obj/Debug/net8.0/NotesApp.AssemblyInfoInputs.cache
+/home/abemelek/Documents/Netprojects/NotesApp/obj/Debug/net8.0/NotesApp.AssemblyInfo.cs
+/home/abemelek/Documents/Netprojects/NotesApp/obj/Debug/net8.0/NotesApp.csproj.CoreCompileInputs.cache
+/home/abemelek/Documents/Netprojects/NotesApp/obj/Debug/net8.0/NotesApp.dll
+/home/abemelek/Documents/Netprojects/NotesApp/obj/Debug/net8.0/refint/NotesApp.dll
+/home/abemelek/Documents/Netprojects/NotesApp/obj/Debug/net8.0/NotesApp.pdb
+/home/abemelek/Documents/Netprojects/NotesApp/obj/Debug/net8.0/NotesApp.genruntimeconfig.cache
+/home/abemelek/Documents/Netprojects/NotesApp/obj/Debug/net8.0/ref/NotesApp.dll
