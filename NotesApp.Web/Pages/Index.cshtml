@@ -1,0 +1,72 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Notes";
+}
+
+<section class="hero">
+    <div>
+        <p class="eyebrow">Focus-first notes</p>
+        <h1>Notes, but calmer.</h1>
+        <p class="lede">Capture ideas fast, search instantly, and edit without losing flow. Everything stays on your device in <code>notes.json</code>.</p>
+        <div class="actions">
+            <button id="addNoteBtn" class="btn primary">New note</button>
+            <button id="searchFocusBtn" class="btn ghost">Search ( / )</button>
+        </div>
+        <div class="meta">
+            <div class="chip" id="noteCount">0 notes</div>
+            <div class="chip subtle">Sorted by last updated</div>
+        </div>
+    </div>
+    <div class="search">
+        <label for="searchInput">Search notes</label>
+        <div class="search-box">
+            <input id="searchInput" type="search" placeholder="Search title, body, or tags" autocomplete="off" />
+            <span class="kbd">/</span>
+        </div>
+    </div>
+</section>
+
+<section class="note-grid" id="notesContainer">
+    <div class="empty">
+        <p class="eyebrow">No notes yet</p>
+        <h2>Start with a title and a thought.</h2>
+        <p>Notes stay local. Create one to see it appear here.</p>
+        <button id="emptyAddBtn" class="btn primary">Add your first note</button>
+    </div>
+</section>
+
+<dialog id="noteDialog">
+    <form method="dialog" class="panel" id="noteForm">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow" id="dialogMode">New note</p>
+                <h3 id="dialogTitle">Create note</h3>
+            </div>
+            <button type="button" class="icon-btn" id="closeDialog" aria-label="Close">×</button>
+        </div>
+
+        <input type="hidden" id="noteId" />
+
+        <label class="field">
+            <span>Title</span>
+            <input id="titleInput" name="title" type="text" required maxlength="200" placeholder="Short, clear title" />
+        </label>
+
+        <label class="field">
+            <span>Body</span>
+            <textarea id="bodyInput" name="body" rows="6" placeholder="Write your note here"></textarea>
+        </label>
+
+        <label class="field">
+            <span>Tags</span>
+            <input id="tagsInput" name="tags" type="text" placeholder="Comma-separated (e.g., work, idea, draft)" />
+        </label>
+
+        <div class="panel-actions">
+            <button type="button" class="btn ghost" id="cancelDialog">Cancel</button>
+            <button type="submit" class="btn primary" id="saveNoteBtn">Save</button>
+        </div>
+    </form>
+</dialog>
+
