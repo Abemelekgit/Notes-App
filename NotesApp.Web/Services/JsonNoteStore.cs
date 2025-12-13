@@ -45,7 +45,13 @@ public class JsonNoteStore : INoteStore
     public async Task<Note> AddAsync(NoteInput input)
     {
         var now = DateTime.UtcNow;
-        var note = new Note(Guid.NewGuid(), input.Title.Trim(), input.Body, NormalizeTags(input.Tags), now, now);
+        var note = new Note(
+            Guid.NewGuid(),
+            input.Title.Trim(),
+            (input.Body ?? string.Empty).Trim(),
+            NormalizeTags(input.Tags),
+            now,
+            now);
         var notes = await LoadAsync();
         notes.Add(note);
         await SaveAsync(notes);
@@ -62,7 +68,7 @@ public class JsonNoteStore : INoteStore
         var updated = existing with
         {
             Title = input.Title.Trim(),
-            Body = input.Body,
+            Body = (input.Body ?? string.Empty).Trim(),
             Tags = NormalizeTags(input.Tags),
             UpdatedAt = DateTime.UtcNow
         };
@@ -112,6 +118,12 @@ public class JsonNoteStore : INoteStore
             if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
             {
                 Directory.CreateDirectory(dir);
+            }
+
+            if (File.Exists(_filePath))
+            {
+                var backupPath = _filePath + ".bak";
+                File.Copy(_filePath, backupPath, overwrite: true);
             }
 
             var json = JsonSerializer.Serialize(notes, _jsonOptions);

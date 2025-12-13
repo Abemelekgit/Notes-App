@@ -1,6 +1,7 @@
 ﻿const state = {
 	notes: [],
-	query: ""
+	query: "",
+	isLoading: false
 };
 
 const SEARCH_KEY = 'notesapp.query';
@@ -79,8 +80,20 @@ function tagsToArray(text) {
 }
 
 function renderNotes() {
-	const { notes } = state;
+	const { notes, isLoading } = state;
 	els.container.innerHTML = '';
+
+	if (isLoading) {
+		const loader = document.createElement('div');
+		loader.className = 'loader';
+		loader.innerHTML = `
+			<div class="spinner" aria-hidden="true"></div>
+			<p>Loading notes...</p>
+		`;
+		els.container.appendChild(loader);
+		updateCount();
+		return;
+	}
 
 	if (!notes.length) {
 		const empty = document.createElement('div');
@@ -107,9 +120,13 @@ function renderNotes() {
 		card.className = 'note-card';
 		card.innerHTML = `
 			<header>
-				<span class="pill-date">Updated ${formatDate(note.updatedAt)}</span>
+				<div class="pill-row">
+					<span class="pill-date">Updated ${formatDate(note.updatedAt)}</span>
+					<span class="pill-date subtle">Created ${formatDate(note.createdAt)}</span>
+				</div>
 				<div class="actions-row">
 					<button class="icon-btn" data-edit="${note.id}">Edit</button>
+					<button class="icon-btn" data-duplicate="${note.id}">Duplicate</button>
 					<button class="icon-btn danger" data-delete="${note.id}">Delete</button>
 				</div>
 			</header>
@@ -118,6 +135,7 @@ function renderNotes() {
 			<div class="tags">${(note.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
 		`;
 		card.querySelector('[data-edit]')?.addEventListener('click', () => openEditDialog(note));
+		card.querySelector('[data-duplicate]')?.addEventListener('click', () => openDuplicateDialog(note));
 		card.querySelector('[data-delete]')?.addEventListener('click', () => confirmDelete(note));
 		els.container.appendChild(card);
 	});
@@ -136,11 +154,15 @@ async function loadNotes(query = '') {
 	try {
 		state.query = query;
 		localStorage.setItem(SEARCH_KEY, query);
-		state.notes = await apiGetNotes(query);
+		state.isLoading = true;
 		renderNotes();
+		state.notes = await apiGetNotes(query);
 	} catch (err) {
 		console.error(err);
 		alert('Could not load notes.');
+	} finally {
+		state.isLoading = false;
+		renderNotes();
 	}
 }
 
@@ -173,6 +195,17 @@ function openEditDialog(note) {
 	els.bodyInput.value = note.body || '';
 	els.tagsInput.value = (note.tags || []).join(', ');
 	els.saveBtn.textContent = 'Update';
+	openDialog();
+}
+
+function openDuplicateDialog(note) {
+	els.dialogMode.textContent = 'Duplicate note';
+	els.dialogTitle.textContent = 'Create copy';
+	els.noteId.value = '';
+	els.titleInput.value = note.title ? `${note.title} (copy)` : 'Untitled copy';
+	els.bodyInput.value = note.body || '';
+	els.tagsInput.value = (note.tags || []).join(', ');
+	els.saveBtn.textContent = 'Save';
 	openDialog();
 }
 
