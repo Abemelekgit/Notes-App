@@ -40,6 +40,19 @@ A small JSON-backed console Notes app built with .NET 8. Supports add, list (new
 6) Add helper prompts for required fields, optional multiline body, and comma-separated tags.
 7) Build and run: `dotnet build` then `dotnet run`.
 
+## Web UI (Razor Pages)
+- Restore/build: `dotnet build NotesApp.Web`
+- Run locally: `dotnet run --project NotesApp.Web`
+- Open the UI: https://localhost:5001 (or the HTTP port shown in the console)
+- Data lives in `NotesApp.Web/notes.json` by default; it is created automatically.
+
+## API endpoints
+- `GET /api/notes?query={q}` — list notes, optional search
+- `GET /api/notes/{id}` — fetch single note
+- `POST /api/notes` — create (JSON: { title, body, tags: [] })
+- `PUT /api/notes/{id}` — update
+- `DELETE /api/notes/{id}` — remove
+
 ## Notes
 - Time stamps use UTC format (`u`) for predictable sorting and display.
 - Tags are deduplicated case-insensitively when entered.

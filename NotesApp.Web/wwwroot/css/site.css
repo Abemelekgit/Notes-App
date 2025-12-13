@@ -235,6 +235,15 @@ main {
   transition: background 0.2s ease, transform 0.08s ease;
 }
 
+.icon-btn.small {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.icon-btn.ghost {
+  background: transparent;
+}
+
 .icon-btn:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-1px); }
 .icon-btn:active { transform: translateY(0); }
 .icon-btn.danger { color: var(--danger); border-color: rgba(248, 113, 113, 0.4); }

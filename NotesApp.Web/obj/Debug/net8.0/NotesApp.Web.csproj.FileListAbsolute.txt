@@ -28,3 +28,5 @@
 /home/abemelek/Documents/Netprojects/NotesApp/NotesApp.Web/obj/Debug/net8.0/NotesApp.Web.pdb
 /home/abemelek/Documents/Netprojects/NotesApp/NotesApp.Web/obj/Debug/net8.0/NotesApp.Web.genruntimeconfig.cache
 /home/abemelek/Documents/Netprojects/NotesApp/NotesApp.Web/obj/Debug/net8.0/ref/NotesApp.Web.dll
+/home/abemelek/Documents/Netprojects/NotesApp/NotesApp.Web/bin/Debug/net8.0/notes.json
+/home/abemelek/Documents/Netprojects/NotesApp/NotesApp.Web/obj/Debug/net8.0/NotesApp.Web.sourcelink.json

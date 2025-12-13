@@ -1,7 +1,7 @@
 using System.Text.Json;
-using NotesApp.Web.Models;
+using NotesApp.Desktop.Models;
 
-namespace NotesApp.Web.Services;
+namespace NotesApp.Desktop.Services;
 
 public interface INoteStore
 {
@@ -15,10 +15,7 @@ public interface INoteStore
 public class JsonNoteStore : INoteStore
 {
     private readonly string _filePath;
-    private readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        WriteIndented = true
-    };
+    private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
     private readonly SemaphoreSlim _mutex = new(1, 1);
 
     public JsonNoteStore(string filePath)
@@ -26,14 +23,22 @@ public class JsonNoteStore : INoteStore
         _filePath = filePath;
     }
 
+    public static string ResolveFilePath()
+    {
+        var local = Path.Combine(AppContext.BaseDirectory, "notes.json");
+        var webPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "NotesApp.Web", "notes.json"));
+        return File.Exists(webPath) || Directory.Exists(Path.GetDirectoryName(webPath)) ? webPath : local;
+    }
+
     public async Task<List<Note>> SearchAsync(string? query)
     {
         var notes = await LoadAsync();
-        var normalizedQuery = query?.Trim();
-        if (string.IsNullOrWhiteSpace(normalizedQuery)) return OrderNotes(notes);
+        if (string.IsNullOrWhiteSpace(query)) return notes.OrderByDescending(n => n.UpdatedAt).ToList();
 
-        return OrderNotes(notes
-            .Where(n => Contains(n.Title, normalizedQuery) || Contains(n.Body, normalizedQuery) || n.Tags.Any(t => Contains(t, normalizedQuery))));
+        return notes
+            .Where(n => Contains(n.Title, query) || Contains(n.Body, query) || n.Tags.Any(t => Contains(t, query)))
+            .OrderByDescending(n => n.UpdatedAt)
+            .ToList();
     }
 
     public async Task<Note?> GetAsync(Guid id)
@@ -90,8 +95,7 @@ public class JsonNoteStore : INoteStore
         {
             if (!File.Exists(_filePath)) return new List<Note>();
             var json = await File.ReadAllTextAsync(_filePath);
-            var loaded = JsonSerializer.Deserialize<List<Note>>(json, _jsonOptions);
-            return OrderNotes(loaded ?? new List<Note>());
+            return JsonSerializer.Deserialize<List<Note>>(json, _jsonOptions) ?? new List<Note>();
         }
         catch
         {
@@ -128,14 +132,8 @@ public class JsonNoteStore : INoteStore
         .Select(t => t.Trim())
         .Where(t => t.Length > 0)
         .Distinct(StringComparer.OrdinalIgnoreCase)
-        .OrderBy(t => t, StringComparer.OrdinalIgnoreCase)
         .ToList();
 
     private static bool Contains(string source, string query) =>
         source?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
-
-    private static List<Note> OrderNotes(IEnumerable<Note> notes) => notes
-        .OrderByDescending(n => n.UpdatedAt)
-        .ThenBy(n => n.Title, StringComparer.OrdinalIgnoreCase)
-        .ToList();
 }

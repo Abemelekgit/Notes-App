@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="NotesApp.Desktop.MainWindow"
+        Width="1100" Height="720"
+        Title="NotesApp Desktop">
+  <Grid RowDefinitions="Auto,*" ColumnDefinitions="2*,*" Padding="12" ColumnSpacing="12" RowSpacing="12">
+    <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8">
+      <TextBox Width="260" Watermark="Search..." Text="{Binding SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+      <Button Content="Search" Click="OnSearch" />
+      <Button Content="Refresh" Click="OnRefresh" />
+      <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="12,0,0,0" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="1"
+              Grid.Column="0"
+              Items="{Binding Notes}"
+              SelectedItem="{Binding SelectedNote, Mode=TwoWay}"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              CanUserSortColumns="True"
+              HeadersVisibility="All">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*" />
+        <DataGridTextColumn Header="Tags" Binding="{Binding TagsText}" Width="1.5*" />
+        <DataGridTextColumn Header="Updated" Binding="{Binding UpdatedAt, StringFormat=u}" Width="1.2*" />
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <Border Grid.Row="1" Grid.Column="1" Padding="12" Background="#1A000000" CornerRadius="6">
+      <StackPanel Spacing="8">
+        <TextBlock Text="Note details" FontWeight="Bold" FontSize="16" />
+        <TextBlock Text="Title" />
+        <TextBox Text="{Binding TitleInput, Mode=TwoWay}" />
+
+        <TextBlock Text="Tags (comma-separated)" />
+        <TextBox Text="{Binding TagsInput, Mode=TwoWay}" />
+
+        <TextBlock Text="Body" />
+        <TextBox TextWrapping="Wrap" AcceptsReturn="True" Height="220" Text="{Binding BodyInput, Mode=TwoWay}" />
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Content="Add New" Click="OnAdd" />
+          <Button Content="Update" Click="OnUpdate" />
+          <Button Content="Delete" Click="OnDelete" />
+          <Button Content="Clear" Click="OnClear" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>

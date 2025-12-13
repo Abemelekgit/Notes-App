@@ -3,11 +3,14 @@
 	query: ""
 };
 
+const SEARCH_KEY = 'notesapp.query';
+
 const els = {
 	container: document.querySelector('#notesContainer'),
 	addBtn: document.querySelector('#addNoteBtn'),
 	emptyAddBtn: document.querySelector('#emptyAddBtn'),
 	searchInput: document.querySelector('#searchInput'),
+	clearSearchBtn: document.querySelector('#clearSearchBtn'),
 	searchFocusBtn: document.querySelector('#searchFocusBtn'),
 	count: document.querySelector('#noteCount'),
 	dialog: document.querySelector('#noteDialog'),
@@ -55,15 +58,24 @@ async function apiDeleteNote(id) {
 }
 
 function formatDate(iso) {
-	const date = new Date(iso + 'Z');
+	const date = new Date(iso);
 	return date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 }
 
 function tagsToArray(text) {
-	return text
+	const seen = new Set();
+	const list = [];
+	text
 		.split(',')
 		.map(t => t.trim())
-		.filter(Boolean);
+		.filter(Boolean)
+		.forEach(t => {
+			const key = t.toLowerCase();
+			if (seen.has(key)) return;
+			seen.add(key);
+			list.push(t);
+		});
+	return list.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 }
 
 function renderNotes() {
@@ -73,10 +85,15 @@ function renderNotes() {
 	if (!notes.length) {
 		const empty = document.createElement('div');
 		empty.className = 'empty';
+		const searching = Boolean(state.query?.length);
+		const title = searching ? 'No matches' : 'Start with a title and a thought.';
+		const message = searching
+			? `No notes matched "${escapeHtml(state.query)}". Try a different keyword or tag.`
+			: 'Notes stay local. Create one to see it appear here.';
 		empty.innerHTML = `
-			<p class="eyebrow">No notes yet</p>
-			<h2>Start with a title and a thought.</h2>
-			<p>Notes stay local. Create one to see it appear here.</p>
+			<p class="eyebrow">${searching ? 'Empty search' : 'No notes yet'}</p>
+			<h2>${title}</h2>
+			<p>${message}</p>
 			<button id="emptyAddDynamic" class="btn primary">Add your first note</button>
 		`;
 		els.container.appendChild(empty);
@@ -118,6 +135,7 @@ function escapeHtml(str) {
 async function loadNotes(query = '') {
 	try {
 		state.query = query;
+		localStorage.setItem(SEARCH_KEY, query);
 		state.notes = await apiGetNotes(query);
 		renderNotes();
 	} catch (err) {
@@ -129,7 +147,10 @@ async function loadNotes(query = '') {
 function updateCount() {
 	const count = state.notes.length;
 	if (els.count) {
-		els.count.textContent = `${count} note${count === 1 ? '' : 's'}`;
+		const label = state.query
+			? `${count} result${count === 1 ? '' : 's'} for "${state.query}"`
+			: `${count} note${count === 1 ? '' : 's'}`;
+		els.count.textContent = label;
 	}
 }
 
@@ -217,6 +238,13 @@ els.emptyAddBtn?.addEventListener('click', openCreateDialog);
 els.closeDialog?.addEventListener('click', closeDialog);
 els.cancelDialog?.addEventListener('click', (e) => { e.preventDefault(); closeDialog(); });
 els.searchFocusBtn?.addEventListener('click', () => els.searchInput?.focus());
+els.clearSearchBtn?.addEventListener('click', () => {
+	if (!els.searchInput) return;
+	els.searchInput.value = '';
+	localStorage.setItem(SEARCH_KEY, '');
+	loadNotes('');
+	els.searchInput.focus();
+});
 
 els.searchInput?.addEventListener('input', (e) => {
 	const value = e.target.value;
@@ -231,9 +259,26 @@ document.addEventListener('keydown', (e) => {
 		e.preventDefault();
 		els.searchInput?.focus();
 	}
-	if (e.key === 'Escape' && els.dialog.open) {
+	if (e.key === 'n' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+		e.preventDefault();
+		openCreateDialog();
+	}
+	if ((e.key === 'Enter' && (e.metaKey || e.ctrlKey)) && isDialogOpen()) {
+		e.preventDefault();
+		els.form?.requestSubmit();
+	}
+	if (e.key === 'Escape' && isDialogOpen()) {
 		closeDialog();
 	}
 });
 
-loadNotes();
+const savedQuery = localStorage.getItem(SEARCH_KEY) ?? '';
+if (els.searchInput) {
+	els.searchInput.value = savedQuery;
+}
+loadNotes(savedQuery);
+
+function isDialogOpen() {
+	if (!els.dialog) return false;
+	return typeof els.dialog.open === 'boolean' ? els.dialog.open : els.dialog.hasAttribute('open');
+}
