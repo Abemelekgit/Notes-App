@@ -62,3 +62,6 @@ Validation
 ## Notes
 - Time stamps use UTC format (`u`) for predictable sorting and display.
 - Tags are deduplicated case-insensitively when entered.
+
+## Changelog
+- 2026-03-10: Small documentation refresh commit.
